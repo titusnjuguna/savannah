@@ -25,7 +25,6 @@ def create_order(request):
         )
         
         return Response({'message':'Order Created successfully','code':HTTP_200_OK},status=HTTP_200_OK)
-    
     return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
