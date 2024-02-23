@@ -1,0 +1,30 @@
+FROM python:3.11-slim-buster
+
+# Create project directory
+WORKDIR /app
+
+# Copy source code
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+# Create the database volume
+VOLUME ["db-data"]
+
+# Set environment variables
+ENV DJANGO_SETTINGS_MODULE=your_project.settings
+ENV SECRET_KEY=your_secret_key  # Replace with your actual secret key
+
+# Set working directory
+WORKDIR /app
+
+# Apply database migrations
+RUN python manage.py migrate
+
+# Start Gunicorn with uWSGI settings
+COPY gunicorn.conf /etc/gunicorn.conf
+RUN uwsgi --ini /etc/gunicorn.conf --master --socket :8000
+
+# Set the entrypoint to serve the app
+ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:8000", "savannah.wsgi:application"]
